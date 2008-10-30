@@ -123,8 +123,7 @@ int parse_file(void) {
             rule_table[rule_cnt]->permission = RULE_DENY;
         } else {
             fprintf(stderr,
-                    "Illegal syntax in configuration file. "
-                    "Unrecognized token at line %d: '%s'\n",
+                    "Syntax error at line %d: '%s'\n",
                     cline, token);
             return -1;
         }
@@ -132,8 +131,7 @@ int parse_file(void) {
         token = strtok(NULL, WHITESPACE_CHARS);
         if (token == NULL) {
             fprintf(stderr,
-                    "Illegal syntax in configuration file. "
-                    "Incomplete rule at line %d.\n",
+                    "Syntax error at line %d: more arguments needed.\n",
                     cline);
             return -1;
         }
@@ -147,8 +145,7 @@ int parse_file(void) {
             token = strtok(NULL,WHITESPACE_CHARS);
             if (parse_ip(token, &rule_table[rule_cnt]->match.ip) != 0) {
                 fprintf(stderr,
-                        "Illegal syntax in configuration file. "
-                        "Unrecognized token at line %d: '%s'\n",
+                        "Syntax error at line %d: '%s'\n",
                         cline, token);
                 return -2;
             }
@@ -158,8 +155,7 @@ int parse_file(void) {
             token = strtok(NULL,WHITESPACE_CHARS);
             if (parse_subnet(token, &rule_table[rule_cnt]->match.subnet) != 0) {
                 fprintf(stderr,
-                        "Illegal syntax in configuration file. "
-                        "Unrecognized token at line %d: '%s'\n",
+                        "Syntax error at line %d: '%s'\n",
                         cline, token);
                 return -2;
             }
@@ -169,8 +165,7 @@ int parse_file(void) {
             token = strtok(NULL,WHITESPACE_CHARS);
             if (parse_range(token, &rule_table[rule_cnt]->match.range) != 0) {
                 fprintf(stderr,
-                        "Illegal syntax in configuration file. "
-                        "Unrecognized token at line %d: '%s'\n",
+                        "Syntax error at line %d: '%s'\n",
                         cline, token);
                 return -2;
             }
@@ -181,8 +176,7 @@ int parse_file(void) {
             if (htonl(rule_table[rule_cnt]->match.range.start.ip_v) >
                 htonl(rule_table[rule_cnt]->match.range.stop.ip_v)) {
                 fprintf(stderr,
-                        "Illegal syntax in configuration file. "
-                        "start address is after the stop address %d: '%s'\n",
+                        "Syntax error at line %d: '%s'\n",
                         cline, token);
                 return -2;
             }
@@ -192,8 +186,7 @@ int parse_file(void) {
         }
         else {
             fprintf(stderr,
-                    "Illegal syntax in configuration file. "
-                    "Incomplete rule at line %d.\n",
+                    "Syntax error at line %d: more arguments needed.\n",
                     cline);
         }
         
