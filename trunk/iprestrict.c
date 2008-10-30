@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <arpa/inet.h>
+
 #include "iprestrict.h"
 #include "parse.h"
 
@@ -173,9 +175,11 @@ int parse_file(void) {
                 return -2;
             }
             /*
-             * The processor is little endinan so the inequality sign is reversed.
+             * We use htonl() to avoid any endianness problems
+             * by forcing a BigEndian comparisson.
              */
-            if (rule_table[rule_cnt]->match.range.start.ip_v < rule_table[rule_cnt]->match.range.stop.ip_v) {
+            if (htonl(rule_table[rule_cnt]->match.range.start.ip_v) >
+                htonl(rule_table[rule_cnt]->match.range.stop.ip_v)) {
                 fprintf(stderr,
                         "Illegal syntax in configuration file. "
                         "start address is after the stop address %d: '%s'\n",
@@ -225,7 +229,7 @@ int parse_file(void) {
 void dbg_dumprules(void) {
     int ix;
 
-    for (ix = 0; ix < rule_cnt; ix++) {
+    for (ix = 0; ix <= rule_cnt; ix++) {
         if (rule_table[ix] != NULL) {
             printf("  -> %s ",
                    rule_table[ix]->permission ? "allow" : "deny");
