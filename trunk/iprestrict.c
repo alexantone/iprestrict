@@ -196,6 +196,11 @@ int parse_file(void) {
 void do_cleanup(void) {
     
     int ix = 0;
+    
+    if (fh != NULL) {
+        fclose(fh);
+    }
+
     for (ix = 0; ix < rule_cnt; ix++) {
         if (rule_table[ix] != NULL) {
             free(rule_table[ix]);
@@ -204,7 +209,7 @@ void do_cleanup(void) {
     
     for (ix = 0; ix < rule_cnt; ix++) {
         /*
-         * TODO: Subinterfaces table cleanup
+         * TODO: Subinterfaces cleanup
          */
     }
 }
@@ -213,20 +218,16 @@ int main (int argc, char *argv[]) {
 
     memset(rule_table, MAX_ENTRIES, sizeof(ipr_rule_t));
     rule_cnt = 0;
-    err = 0;
+    int exit_code = 0;
 
     if (parse_args(argc, argv) !=  0) {
-        if (fh != NULL) {
-            fclose(fh);
-        }
-        err = -1;
+        exit_code = -1;
+        goto cleanup;
     }
 
     if (parse_file() != 0) {
-        if (fh != NULL) {
-            fclose(fh);
-        }
-        return -1;
+        exit_code = -1;
+        goto cleanup;
     }
 
     fprintf(stdout,
@@ -234,7 +235,8 @@ int main (int argc, char *argv[]) {
             "Number of rules in effect: %d\n",
             rule_cnt + 1);
 
+cleanup:
     do_cleanup();
 
-    return 0;
+    return exit_code;
 }
