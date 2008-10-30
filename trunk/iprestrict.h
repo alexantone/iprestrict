@@ -47,14 +47,5 @@ typedef struct {
 
 #define MAX_ENTRIES 1024
 
-static ipr_rule_t* rule_table[MAX_ENTRIES];
-static int rule_cnt = 0;
-
-static const char *default_locations[] = {
-        "/etc/iprestrict.cfg",
-        "./iprestrict.cfg" };
-
-static const int default_locations_cnt = sizeof(default_locations)
-        / sizeof(default_locations[0]);
 
 #endif /* IPRESTRICT_H_ */
