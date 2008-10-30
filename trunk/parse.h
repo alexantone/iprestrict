@@ -13,8 +13,12 @@
 
 #define WHITESPACE_CHARS " \t"
 
-extern int parse_ip (char* token, int cline, int rule_cnt);
-extern int parse_range (char* token, int cline, int rule_cnt);
-extern int parse_subnet (char* token, int cline, int rule_cnt);
+#define BASE10 10
+#define BASE16 16
+
+extern int parse_ip(const char * const token, ipr_ip_t * const out);
+extern int parse_range(const char * const token, ipr_range_t * const out);
+extern int parse_subnet(const char* const token, ipr_subnet_t * const out);
+extern int parse_file (FILE *fh);
 
 #endif /* PARSE_H_ */
