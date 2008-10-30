@@ -143,7 +143,7 @@ int parse_file(void) {
                         "Illegal syntax in configuration file. "
                         "Unrecognized token at line %d: '%s'\n",
                         cline, token);
-                retrun -2;
+                return -2;
             }
         }
         else if (strcmp(token, "subnet") == 0) {
@@ -154,7 +154,7 @@ int parse_file(void) {
                         "Illegal syntax in configuration file. "
                         "Unrecognized token at line %d: '%s'\n",
                         cline, token);
-                retrun -2;
+                return -2;
             }
         }
         else if (strcmp(token, "range") == 0) {
@@ -165,7 +165,7 @@ int parse_file(void) {
                         "Illegal syntax in configuration file. "
                         "Unrecognized token at line %d: '%s'\n",
                         cline, token);
-                retrun -2;
+                return -2;
             }
         }
         else if (strcmp(token, "all") == 0) {
@@ -235,10 +235,10 @@ void dbg_dumprules(void) {
                     break;
                 case RULE_SUBNET:
                     printf("subnet %d.%d.%d.%d/%d\n",
-                           rule_table[ix]->match.subnet.ip_dd[0],
-                           rule_table[ix]->match.subnet.ip_dd[1],
-                           rule_table[ix]->match.subnet.ip_dd[2],
-                           rule_table[ix]->match.subnet.ip_dd[3],
+                           rule_table[ix]->match.subnet.ip.ip_dd[0],
+                           rule_table[ix]->match.subnet.ip.ip_dd[1],
+                           rule_table[ix]->match.subnet.ip.ip_dd[2],
+                           rule_table[ix]->match.subnet.ip.ip_dd[3],
                            rule_table[ix]->match.subnet.mask);
                     break;
                 case RULE_ALL:
