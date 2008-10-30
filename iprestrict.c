@@ -13,7 +13,7 @@
 
 
 #include "iprestrict.h"
-#include "check_functions.c"
+#include "parse.h"
 
 static FILE *fh = NULL;
 static char *ifdev = NULL;
