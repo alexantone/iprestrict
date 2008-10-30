@@ -40,11 +40,6 @@ int parse_ip (const char * const token, ipr_ip_t * const out) {
         out->ip_dd[ix] = temp_byte;
     }
 
-    /*
-     * There should not be any more chracters after the ip 
-     * except for whitespace.
-     */
-    cursor += strspn(cursor, WHITESPACE_CHARS);
     if (*cursor != '\0') {
         return -3;
     }
@@ -111,11 +106,6 @@ int parse_range (const char * const token, ipr_range_t * const out) {
         out->stop.ip_dd[ix] = temp_byte;
     }
 
-    /*
-     * There should not be any more chracters after the ip 
-     * except for whitespace.
-     */
-    cursor += strspn(cursor, WHITESPACE_CHARS);
     if (*cursor != '\0') {
         return -3;
     }
