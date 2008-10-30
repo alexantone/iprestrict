@@ -38,6 +38,7 @@ int parse_ip (const char * const token, ipr_ip_t * const out) {
         }
         
         out->ip_dd[ix] = temp_byte;
+        ix++;
     }
 
     if (*cursor != '\0') {
@@ -78,12 +79,13 @@ int parse_range (const char * const token, ipr_range_t * const out) {
         }
 
         out->start.ip_dd[ix] = temp_byte;
+        ix++;
     }
     
     if (*cursor != '-') {
         return -3;
     }
-
+    cursor++;
     /*
      * Parse the second ip.
      */
@@ -104,6 +106,7 @@ int parse_range (const char * const token, ipr_range_t * const out) {
         }
 
         out->stop.ip_dd[ix] = temp_byte;
+        ix++;
     }
 
     if (*cursor != '\0') {
@@ -145,6 +148,7 @@ int parse_subnet (const char* const token, ipr_subnet_t * const out) {
         }
 
         out->ip.ip_dd[ix] = temp_byte;
+        ix++;
     }
     
     if (*cursor != '/') {
