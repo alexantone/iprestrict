@@ -1,20 +1,19 @@
 /*
- * check_functions.c
+ *----------------------------------------------------------
+ * parse.c
  *
  *  Created on: Oct 24, 2008
  *      Author: sorin
+ * ---------------------------------------------------------
  */
 
-/*
- *  Ip check function
- */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "iprestrict.h"
 
-int ip_check(char* token, int cline, int rule_cnt) {
+int ip_check (char* token, int cline, int rule_cnt) {
 
 	char* word;
 	int ix=0;
