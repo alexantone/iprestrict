@@ -138,18 +138,35 @@ int parse_file(void) {
         if (strcmp(token, "ip") == 0) {
             rule_table[rule_cnt]->type = RULE_IP;
             token = strtok(NULL,WHITESPACE_CHARS);
-            parse_ip(token, &rule_table[rule_cnt]->match.ip);
+            if (parse_ip(token, &rule_table[rule_cnt]->match.ip) != 0) {
+                fprintf(stderr,
+                        "Illegal syntax in configuration file. "
+                        "Unrecognized token at line %d: '%s'\n",
+                        cline, token);
+                retrun -2;
+            }
         }
         else if (strcmp(token, "subnet") == 0) {
             rule_table[rule_cnt]->type = RULE_SUBNET;
             token = strtok(NULL,WHITESPACE_CHARS);
-            parse_subnet(token, &rule_table[rule_cnt]->match.subnet);
-
+            if (parse_subnet(token, &rule_table[rule_cnt]->match.subnet) != 0) {
+                fprintf(stderr,
+                        "Illegal syntax in configuration file. "
+                        "Unrecognized token at line %d: '%s'\n",
+                        cline, token);
+                retrun -2;
+            }
         }
         else if (strcmp(token, "range") == 0) {
             rule_table[rule_cnt]->type = RULE_RANGE;
             token = strtok(NULL,WHITESPACE_CHARS);
-            parse_range(token, &rule_table[rule_cnt]->match.range);
+            if (parse_range(token, &rule_table[rule_cnt]->match.range) != 0) {
+                fprintf(stderr,
+                        "Illegal syntax in configuration file. "
+                        "Unrecognized token at line %d: '%s'\n",
+                        cline, token);
+                retrun -2;
+            }
         }
         else if (strcmp(token, "all") == 0) {
             rule_table[rule_cnt]->type = RULE_ALL;
@@ -188,6 +205,51 @@ int parse_file(void) {
     }
 
     return 0;
+}
+
+void dbg_dumprules(void) {
+    int ix;
+
+    for (ix = 0; ix < rule_cnt; ix++) {
+        if (rule_table[ix] != NULL) {
+            printf("  -> %s ",
+                   rule_table[ix]->permission ? "allow" : "deny");
+            switch(rule_table[ix]->type) {
+                case RULE_IP:
+                    printf("ip %d.%d.%d.%d\n",
+                           rule_table[ix]->match.ip.ip_dd[0],
+                           rule_table[ix]->match.ip.ip_dd[1],
+                           rule_table[ix]->match.ip.ip_dd[2],
+                           rule_table[ix]->match.ip.ip_dd[3]);
+                    break;
+                case RULE_RANGE:
+                    printf("range %d.%d.%d.%d-%d.%d.%d.%d\n",
+                           rule_table[ix]->match.range.start.ip_dd[0],
+                           rule_table[ix]->match.range.start.ip_dd[1],
+                           rule_table[ix]->match.range.start.ip_dd[2],
+                           rule_table[ix]->match.range.start.ip_dd[3],
+                           rule_table[ix]->match.range.stop.ip_dd[0],
+                           rule_table[ix]->match.range.stop.ip_dd[1],
+                           rule_table[ix]->match.range.stop.ip_dd[2],
+                           rule_table[ix]->match.range.stop.ip_dd[3]);
+                    break;
+                case RULE_SUBNET:
+                    printf("subnet %d.%d.%d.%d/%d\n",
+                           rule_table[ix]->match.subnet.ip_dd[0],
+                           rule_table[ix]->match.subnet.ip_dd[1],
+                           rule_table[ix]->match.subnet.ip_dd[2],
+                           rule_table[ix]->match.subnet.ip_dd[3],
+                           rule_table[ix]->match.subnet.mask);
+                    break;
+                case RULE_ALL:
+                    printf("all\n");
+                    break;
+                default:
+                    printf("*** Some bad data was parsed ***");
+            }
+        }
+    }
+
 }
 
 /*
@@ -234,7 +296,16 @@ int main (int argc, char *argv[]) {
             "  ... Parsing of file was scucessuful. "
             "Number of rules in effect: %d\n",
             rule_cnt + 1);
+    
+    dbg_dumprules();
 
+    /*
+     * Main program loop
+     */
+    while (1) {
+        
+    }
+    
 cleanup:
     do_cleanup();
 
