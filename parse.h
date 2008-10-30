@@ -11,7 +11,7 @@
 #define PARSE_H_
 
 
-#define WHITESPACE_CHARS " \t"
+#define WHITESPACE_CHARS " \t\n"
 
 #define BASE10 10
 #define BASE16 16

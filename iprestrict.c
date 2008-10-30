@@ -68,6 +68,7 @@ int parse_file(void) {
 
     int ix = 0;
     char line_buf[512];
+    char *cursor;
     char *token = NULL;
     int cline = 0;
 
@@ -93,19 +94,28 @@ int parse_file(void) {
          * Eat white-space chars
          */
         cline++;
+        cursor = line_buf;
 
-        *line_buf += strspn(line_buf, WHITESPACE_CHARS);
-        if ((*line_buf = '#')) {
+        cursor += strspn(cursor, WHITESPACE_CHARS);
+        if (*cursor == '#') {
             /*
              * this is a comment; skip to the next line
              */
             continue;
         }
 
-        token = strtok(line_buf, WHITESPACE_CHARS);
+        token = strtok(cursor, WHITESPACE_CHARS);
         if (token == NULL) {
             continue;
-        } else if (strcmp(token, "allow") == 0) {
+        }
+        
+        rule_table[rule_cnt] = malloc(sizeof(ipr_rule_t));
+        if (rule_table[rule_cnt] == NULL) {
+            fprintf(stderr,"Could not allocate memory.");
+            return -1;
+        }
+        
+        if (strcmp(token, "allow") == 0) {
             rule_table[rule_cnt]->permission = RULE_ALLOW;
         } else if (strcmp(token, "deny") == 0) {
             rule_table[rule_cnt]->permission = RULE_DENY;
@@ -129,11 +139,6 @@ int parse_file(void) {
         /*
          *  Determine the type
          */
-        rule_table[rule_cnt] = malloc(sizeof(ipr_rule_t));
-        if (rule_table[rule_cnt] == NULL) {
-            fprintf(stderr,"Could not allocate memory.");
-            return -1;
-        }
 
         if (strcmp(token, "ip") == 0) {
             rule_table[rule_cnt]->type = RULE_IP;
@@ -164,6 +169,16 @@ int parse_file(void) {
                 fprintf(stderr,
                         "Illegal syntax in configuration file. "
                         "Unrecognized token at line %d: '%s'\n",
+                        cline, token);
+                return -2;
+            }
+            /*
+             * The processor is little endinan so the inequality sign is reversed.
+             */
+            if (rule_table[rule_cnt]->match.range.start.ip_v < rule_table[rule_cnt]->match.range.stop.ip_v) {
+                fprintf(stderr,
+                        "Illegal syntax in configuration file. "
+                        "start address is after the stop address %d: '%s'\n",
                         cline, token);
                 return -2;
             }
