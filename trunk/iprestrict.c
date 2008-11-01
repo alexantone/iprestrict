@@ -187,6 +187,14 @@ int main (int argc, char *argv[])
     }
 
     /*
+     * Avoid blocking own ip by setting an "allow ip <own ip>" rule
+     */
+
+    /*
+     * TODO: find a way to get the device's ip
+     */
+
+    /*
      * Clear possible active subinterfaces
      */
     if_all_down(dev);
