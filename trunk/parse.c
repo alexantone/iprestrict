@@ -17,42 +17,39 @@
 #include "parse.h"
 
 int parse_args (const int argc, char * const argv[],
-                FILE ** p_fh, char ** p_ifdev)
+                FILE ** p_fh, char ** const p_ifdev)
 {
 
 
     int ix = 1;
-    FILE * fh = NULL;
-    char * ifdev = NULL;
 
     if (p_fh == NULL || p_ifdev == NULL) {
         return -1;
     }
-    fh = *p_fh;
-    ifdev = *p_ifdev;
 
     while (ix < argc) {
 
-        if (strcmp(argv[ix], "-f") == 0 && fh == NULL) {
+        if (strcmp(argv[ix], "-f") == 0 && *p_fh == NULL) {
             /*
              * Parse the filename
              */
             ix++;
 
-            fh = fopen(argv[ix], "r");
+            *p_fh = fopen(argv[ix], "r");
 
-            if (fh == NULL) {
+            if (*p_fh == NULL) {
                 fprintf(stderr,
                 "File %s could not be opened!\n", argv[ix]);
                 return -1;
             }
             ix++;
-        } else if (strcmp(argv[ix], "-i") == 0 && ifdev == NULL) {
+        } else if (strcmp(argv[ix], "-i") == 0 && *p_ifdev == NULL) {
             /*
              * Parse the interface
              */
             ix++;
-            strcpy(ifdev, argv[ix]);
+            *p_ifdev = malloc(strlen(argv[ix]));
+            strcpy(*p_ifdev, argv[ix]);
             ix++;
 
         } else {
@@ -229,30 +226,28 @@ int parse_file(FILE ** p_fh)
     char *cursor;
     char *token = NULL;
     int cline = 0;
-    FILE * fh = NULL;
 
     if (p_fh == NULL) {
         return -1;
     }
-    fh = *p_fh;
 
-    if (fh == NULL) {
+    if (*p_fh == NULL) {
         fprintf(stderr, "No configuration file was specified.\n");
     }
 
-    while (fh == NULL && ix < default_locations_cnt) {
+    while (*p_fh == NULL && ix < default_locations_cnt) {
         fprintf(stdout,
                 "Searching for a file in default location: %s\n",
                 default_locations[ix]);
-        fh = fopen(default_locations[ix++], "r");
+        *p_fh = fopen(default_locations[ix++], "r");
     }
 
-    if (fh == NULL) {
+    if (*p_fh == NULL) {
         fprintf(stderr, "No configuration file could be found\n");
         return -1;
     }
 
-    while (fgets(line_buf, sizeof(line_buf), fh) &&
+    while (fgets(line_buf, sizeof(line_buf), *p_fh) &&
            rule_cnt < MAX_ENTRIES - 1) {
         /*
          * Eat white-space chars
@@ -376,8 +371,8 @@ int parse_file(FILE ** p_fh)
     rule_table[rule_cnt]->permission = RULE_DENY;
     rule_table[rule_cnt]->type = RULE_ALL;
 
-    if (fh != NULL) {
-        fclose(fh);
+    if (*p_fh != NULL) {
+        fclose(*p_fh);
     }
 
     return 0;

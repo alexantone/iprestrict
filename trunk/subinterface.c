@@ -7,3 +7,11 @@
  * ------------------------------------------------------------------------
  */
 
+#include  "subinterface.h"
+
+void block_ip(const ipr_ip_t ip)
+{
+    /*
+     * TODO: impelemtation
+     */
+}
