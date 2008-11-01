@@ -34,22 +34,26 @@ static void check_ip(ipr_ip_t ip)
         switch(rule_table[ix]->type) {
         case RULE_ALL:
             process_ip(rule_table[ix]->permission, ip);
+            return;
             break;
         case RULE_IP:
             if (rule_table[ix]->match.ip.ip_v == ip.ip_v) {
                 process_ip(rule_table[ix]->permission, ip);
+                return;
             }
             break;
         case RULE_RANGE:
             if (ip_val(rule_table[ix]->match.range.start) <= ip_val(ip) &&
                 ip_val(rule_table[ix]->match.range.stop) >= ip_val(ip)) {
                 process_ip(rule_table[ix]->permission, ip);
+                return;
             }
             break;
         case RULE_SUBNET:
             if (((ip_val(ip) ^ ip_val(rule_table[ix]->match.subnet.ip)) &
                   (0xffffffff << (32 - rule_table[ix]->match.subnet.mask))) == 0) {
                 process_ip(rule_table[ix]->permission, ip);
+                return;
             }
             break;
         default:

@@ -113,6 +113,11 @@ int main (int argc, char *argv[])
     rule_cnt = 0;
     int exit_code = 0;
     int pargs_result = 0;
+    int ix = 0;
+
+    /*
+     * Register function for signal handling
+     */
 
     pargs_result = parse_args(argc, argv, &fh, &dev);
     if (pargs_result != 0) {
@@ -124,6 +129,7 @@ int main (int argc, char *argv[])
         goto cleanup;
     } else
 
+
     if (parse_file(&fh) != 0) {
         exit_code = 1;
         goto cleanup;
@@ -131,8 +137,7 @@ int main (int argc, char *argv[])
 
     fprintf(stdout,
             "  ... Parsing of file was scucessuful. "
-            "Number of rules in effect: %d\n",
-            rule_cnt + 1);
+            "Number of rules in effect: %d\n", rule_cnt);
 
 #if DEBUG
     dbg_dumprules();
@@ -167,6 +172,10 @@ int main (int argc, char *argv[])
         goto cleanup;
     }
 
+    /*
+     * Clear possible active subinterfaces
+     */
+    if_all_down(dev);
 
     /* now we can set our callback function */
     pcap_loop(handle, -1, got_packet, NULL);

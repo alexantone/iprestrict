@@ -23,5 +23,7 @@ extern void if_up(const char * const interface,
 extern void if_down(const char * const interface,
              const unsigned int subinterface);
 
+extern void if_all_down(const char * const interface);
+
 
 #endif /* SUBINTERFACE_H_ */
