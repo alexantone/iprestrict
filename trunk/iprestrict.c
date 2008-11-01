@@ -159,7 +159,8 @@ int main (int argc, char *argv[])
     }
 
     /* open capture device timeout = 1sec */
-    handle = pcap_open_live(dev, IP_HEADER_LEN, TRUE, 1000, errbuf);
+    handle = pcap_open_live(dev, ETHERNET_HEADER_LEN + IP_HEADER_LEN,
+                            TRUE, 1000, errbuf);
     if (handle == NULL) {
         fprintf(stderr, "Couldn't open device %s: %s\n", dev, errbuf);
         exit_code = 1;

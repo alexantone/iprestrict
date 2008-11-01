@@ -12,12 +12,14 @@
 
 #include "subinterface.h"
 
+#define IFCONFIG "/sbin/ifconfig"
+
 void if_up(const char * const interface,
            const unsigned int subinterface,
            const ipr_ip_t ip)
 {
     char * cmd[256];
-    sprintf(cmd,"ifconfig %s:%d %d.%d.%d.%d netmask 255.255.255.255",
+    sprintf(cmd, IFCONFIG" %s:%d %d.%d.%d.%d netmask 255.255.255.255",
             interface, subinterface,
             ip.ip_dd[0], ip.ip_dd[1], ip.ip_dd[2], ip.ip_dd[3]);
 
@@ -28,7 +30,7 @@ void if_up(const char * const interface,
                 interface, subinterface);
     } else {
         fprintf(stdout,
-                " Blocked ip: %d.%d.%d.%d by colliding on iterface %s:%d",
+                " Blocked ip: %d.%d.%d.%d by colliding on iterface %s:%d\n",
                 ip.ip_dd[0], ip.ip_dd[1], ip.ip_dd[2], ip.ip_dd[3],
                 interface, subinterface);
     }
@@ -38,16 +40,16 @@ void if_down(const char * const interface,
              const unsigned int subinterface)
 {
     char * cmd[256];
-    sprintf(cmd,"ifconfig %s:%d down",
+    sprintf(cmd, IFCONFIG" %s:%d down",
             interface, subinterface);
 
     if (system(cmd) != 0) {
         fprintf(stderr,
-                " [!] Some error has occured when shutting down iterface %s:%d",
+                " [!] Some error has occured when shutting down iterface %s:%d\n",
                 interface, subinterface);
     } else {
         fprintf(stdout,
-                " Released iterface %s:%d",
+                " Released iterface %s:%d\n",
                 interface, subinterface);
     }
 
