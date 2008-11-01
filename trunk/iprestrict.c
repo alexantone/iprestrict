@@ -33,6 +33,7 @@ inline uint32_t ip_val(ipr_ip_t ip)
             (ip.ip_dd[3] <<  0));
 }
 
+#if DEBUG
 void dbg_dumprules(void) {
     int ix;
 
@@ -77,6 +78,7 @@ void dbg_dumprules(void) {
     }
 
 }
+#endif
 
 /*
  * Memory freeing routine and cleanup before exiting
@@ -132,7 +134,9 @@ int main (int argc, char *argv[])
             "Number of rules in effect: %d\n",
             rule_cnt + 1);
 
+#if DEBUG
     dbg_dumprules();
+#endif
 
     /*
      * Main program loop
