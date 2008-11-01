@@ -257,12 +257,12 @@ int parse_rule(const char * const line_buf, const int cline)
         /*
          * this is a comment; skip to the next line
          */
-        return 0;
+        return 1;
     }
 
     token = strtok(cursor, WHITESPACE_CHARS);
     if (token == NULL) {
-        return 0;
+        return 1;
     }
 
     rule_table[rule_cnt] = malloc(sizeof(ipr_rule_t));
@@ -390,11 +390,17 @@ int parse_file(FILE ** p_fh)
         cline++;
 
         prule_result = parse_rule(line_buf, cline);
-        if (prule_result !=0 ){
+        if (prule_result < 0 ){
             return prule_result;
         }
-
-        rule_cnt++;
+        else if (prule_result == 0) {
+            rule_cnt++;
+        }
+        else {
+            /*
+             * This line was just a comment so skip it
+             */
+        }
     }
 
     /*
