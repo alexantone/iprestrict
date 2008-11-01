@@ -16,6 +16,24 @@
 #include "iprestrict.h"
 #include "parse.h"
 
+#define USAGE_MSG \
+    "Usage:\n"\
+    "   iprestrict [-i <interface>] [-f <configuration file>]\n"\
+    "   iprestrict --help\n"\
+    "\n"\
+    "  -i <interface> : specify the interface to be monitored.\n"\
+    "                   If missing, the default interface is used.\n"\
+    "  -f <configuration file> : specify the configuration file.\n"\
+    "                            If missing the program will look for\n"\
+    "                            iprestrict.cfg in /etc/ or the current dir.\n"\
+    "  --help : show this usage message.\n"
+
+
+
+static void display_usage(void) {
+    fprintf(stdout, USAGE_MSG);
+}
+
 int parse_args (const int argc, char * const argv[],
                 FILE ** p_fh, char ** const p_ifdev)
 {
@@ -43,7 +61,8 @@ int parse_args (const int argc, char * const argv[],
                 return -1;
             }
             ix++;
-        } else if (strcmp(argv[ix], "-i") == 0 && *p_ifdev == NULL) {
+        }
+        else if (strcmp(argv[ix], "-i") == 0 && *p_ifdev == NULL) {
             /*
              * Parse the interface
              */
@@ -52,7 +71,12 @@ int parse_args (const int argc, char * const argv[],
             strcpy(*p_ifdev, argv[ix]);
             ix++;
 
-        } else {
+        }
+        else if (strcmp(argv[ix], "--help") == 0) {
+            display_usage();
+            return 1;
+        }
+        else {
             fprintf(stderr,
             "Unknown or duplicate argument:%s\n", argv[ix]);
             return -1;

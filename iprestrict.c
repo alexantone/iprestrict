@@ -110,11 +110,17 @@ int main (int argc, char *argv[])
 
     rule_cnt = 0;
     int exit_code = 0;
+    int pargs_result = 0;
 
-    if (parse_args(argc, argv, &fh, &dev) !=  0) {
-        exit_code = 1;
+    pargs_result = parse_args(argc, argv, &fh, &dev);
+    if (pargs_result != 0) {
+        /*
+         * parse_args() could have returned 1 which means
+         * that the usage message was requested.
+         */
+        exit_code = (pargs_result == 1) ? 0 : 1;
         goto cleanup;
-    }
+    } else
 
     if (parse_file(&fh) != 0) {
         exit_code = 1;
