@@ -67,7 +67,7 @@ extern int rule_cnt;
  * Device subinterfaces structures
  */
 
-#define MAX_SUBINTERFACES 1024
+#define MAX_SUBINTERFACES 256
 
 typedef struct {
     unsigned char inuse;

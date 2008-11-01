@@ -56,7 +56,59 @@ void if_down(const char * const interface,
 
 void block_ip(const ipr_ip_t ip)
 {
-    /*
-     * TODO: impelemtation
-     */
+    int ix = 0;
+    int found_if = 0;
+    long last_free_if = -1;
+    unsigned int smallest_ttl = MAX_TTL;
+    unsigned int smallest_ttl_if = 0;
+
+
+
+    for (ix = 0; ix < MAX_SUBINTERFACES; ix++) {
+        if (subif_table[ix].inuse) {
+            if (subif_table[ix].ip.ip_v == ip.ip_v) {
+                found_if = 1;
+                subif_table[ix].ttl = MAX_TTL;
+                break;
+            } else {
+
+                /*
+                 * Decrease the TTL and disable it if reached 0.
+                 */
+                subif_table[ix].ttl--;
+
+                if (subif_table[ix].ttl < smallest_ttl) {
+                    smallest_ttl = subif_table[ix].ttl;
+                    smallest_ttl_if = ix;
+                }
+
+                if (subif_table[ix].ttl == 0) {
+                    subif_table[ix].inuse = FALSE;
+                    if_down(dev, subif_table[ix].id);
+                    last_free_if = ix;
+                }
+
+            }
+        }
+    }
+
+    if (!found_if) {
+        /*
+         * if there is no free interface use the one whith the smallest ttl
+         * (which is the oldest one).
+         * No need to put it down first; it will be directly overwritten.
+         */
+        if (last_free_if < 0) {
+            if_up(dev, subif_table[smallest_ttl_if].id, ip);
+        }
+        /*
+         * Use the last free interface and enable it setting the TTL to max.
+         */
+        else {
+            subif_table[last_free_if].inuse = TRUE;
+            subif_table[last_free_if].id = last_free_if;
+            if_up(dev, last_free_if, ip);
+
+        }
+    }
 }
