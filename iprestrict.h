@@ -5,6 +5,8 @@
  *      Author: sorin
  */
 
+#include <stdint.h>
+
 #ifndef IPRESTRICT_H_
 #define IPRESTRICT_H_
 
@@ -18,6 +20,12 @@
 
 #define MAX_MASK_BYTES 32
 
+
+#define IP_HEADER_LEN  20
+
+#define TRUE  1
+#define FALSE 0
+
 /*
  * Rules structures
  */
@@ -26,7 +34,7 @@
 
 typedef union {
     unsigned char ip_dd[4];
-    long int      ip_v;
+    uint32_t      ip_v;
 } ipr_ip_t;
 
 typedef struct {
@@ -68,5 +76,6 @@ typedef struct {
 } dev_sif_t;
 
 extern dev_sif_t subif_table[MAX_SUBINTERFACES];
+extern inline uint32_t ip_val(ipr_ip_t ip);
 
 #endif /* IPRESTRICT_H_ */
