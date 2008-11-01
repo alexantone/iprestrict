@@ -398,6 +398,7 @@ int parse_file(FILE ** p_fh)
 
     if (*p_fh != NULL) {
         fclose(*p_fh);
+        *p_fh = NULL;
     }
 
     return 0;

@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
+
 #include <pcap.h>
 
 #include "iprestrict.h"
@@ -17,7 +19,9 @@
 #include "capture.h"
 #include "subinterface.h"
 
-static FILE *fh = NULL;
+static FILE *fh = NULL;                    /* config file handle */
+static pcap_t *handle = NULL;              /* packet capture handle */
+
 char *dev = NULL;
 
 ipr_rule_t* rule_table[MAX_ENTRIES];
@@ -87,8 +91,14 @@ void do_cleanup(void) {
 
     int ix = 0;
 
+    if_all_down(dev);
+
     if (fh != NULL) {
         fclose(fh);
+    }
+
+    if (handle != NULL) {
+        pcap_close(handle);
     }
 
     for (ix = 0; ix < rule_cnt; ix++) {
@@ -96,13 +106,15 @@ void do_cleanup(void) {
             free(rule_table[ix]);
         }
     }
-
-    for (ix = 0; ix < MAX_SUBINTERFACES; ix++) {
-        if (subif_table[ix].inuse) {
-            if_down(dev, subif_table[ix].id);
-        }
-    }
 }
+
+
+static int terminate(int param){
+    do_cleanup();
+    fprintf(stdout, "\n  Exiting program...\n");
+    exit(EXIT_FAILURE);
+}
+
 
 int main (int argc, char *argv[])
 {
@@ -111,13 +123,16 @@ int main (int argc, char *argv[])
     memset(subif_table, 0, sizeof(subif_table));
 
     rule_cnt = 0;
-    int exit_code = 0;
+    int exit_code = EXIT_SUCCESS;
     int pargs_result = 0;
-    int ix = 0;
 
     /*
      * Register function for signal handling
      */
+    signal(SIGABRT,terminate);
+    signal(SIGTERM,terminate);
+    signal(SIGINT, terminate);
+    signal(SIGKILL,terminate);
 
     pargs_result = parse_args(argc, argv, &fh, &dev);
     if (pargs_result != 0) {
@@ -125,13 +140,13 @@ int main (int argc, char *argv[])
          * parse_args() could have returned 1 which means
          * that the usage message was requested.
          */
-        exit_code = (pargs_result == 1) ? 0 : 1;
+        exit_code = (pargs_result == 1) ? EXIT_SUCCESS : EXIT_FAILURE;
         goto cleanup;
     } else
 
 
     if (parse_file(&fh) != 0) {
-        exit_code = 1;
+        exit_code = EXIT_FAILURE;
         goto cleanup;
     }
 
@@ -148,7 +163,6 @@ int main (int argc, char *argv[])
      */
 
     char   errbuf[PCAP_ERRBUF_SIZE];      /* error buffer */
-    pcap_t *handle = NULL;		/* packet capture handle */
 
 
 
@@ -158,7 +172,7 @@ int main (int argc, char *argv[])
         if (dev == NULL) {
             fprintf(stderr, "Couldn't find default device: %s\n",
                     errbuf);
-            exit_code = 1;
+            exit_code = EXIT_FAILURE;
             goto cleanup;
         }
     }
@@ -168,7 +182,7 @@ int main (int argc, char *argv[])
                             TRUE, 1000, errbuf);
     if (handle == NULL) {
         fprintf(stderr, "Couldn't open device %s: %s\n", dev, errbuf);
-        exit_code = 1;
+        exit_code = EXIT_FAILURE;
         goto cleanup;
     }
 
@@ -176,14 +190,16 @@ int main (int argc, char *argv[])
      * Clear possible active subinterfaces
      */
     if_all_down(dev);
+    fprintf(stdout, "\n  Hit ^C to stop the program.\n\n");
 
     /* now we can set our callback function */
     pcap_loop(handle, -1, got_packet, NULL);
 
     /* cleanup */
 cleanup:
-    pcap_close(handle);
     do_cleanup();
+
+    fprintf(stdout, "\n  Exiting program...\n");
 
     return exit_code;
 }
