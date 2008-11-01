@@ -65,7 +65,7 @@ int parse_args (const int argc, char * const argv[],
 }
 
 
-int parse_ip (const char * const token, ipr_ip_t * const out)
+static int parse_ip (const char * const token, ipr_ip_t * const out)
 {
 
     int ix = 0;
@@ -104,7 +104,7 @@ int parse_ip (const char * const token, ipr_ip_t * const out)
  * Range check function
  */
 
-int parse_range (const char * const token, ipr_range_t * const out)
+static int parse_range (const char * const token, ipr_range_t * const out)
 {
 
     int ix = 0;
@@ -173,7 +173,7 @@ int parse_range (const char * const token, ipr_range_t * const out)
  *  Mask check function
  */
 
-int parse_subnet (const char* const token, ipr_subnet_t * const out)
+static int parse_subnet (const char* const token, ipr_subnet_t * const out)
 {
 
     int ix = 0;
