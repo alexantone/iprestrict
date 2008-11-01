@@ -12,6 +12,8 @@
 #ifndef SUBINTERFACE_H_
 #define SUBINTERFACE_H_
 
+#define MAX_TTL 256
+
 extern void block_ip(ipr_ip_t ip);
 
 extern void if_up(const char * const interface,

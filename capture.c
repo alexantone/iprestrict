@@ -16,6 +16,10 @@ static void process_ip(const unsigned char permision, const ipr_ip_t ip)
     if (permision == RULE_DENY) {
         block_ip(ip);
     }
+    /*
+     * else no need to do anything
+     */
+
 }
 
 
@@ -43,8 +47,8 @@ static void check_ip(ipr_ip_t ip)
             }
             break;
         case RULE_SUBNET:
-            if ((ip_val(ip) ^ ip_val(rule_table[ix]->match.subnet.ip)) &
-                    (0xffffffff << 32 - rule_table[ix]->match.subnet.mask) == 0) {
+            if (((ip_val(ip) ^ ip_val(rule_table[ix]->match.subnet.ip)) &
+                  (0xffffffff << (32 - rule_table[ix]->match.subnet.mask))) == 0) {
                 process_ip(rule_table[ix]->permission, ip);
             }
             break;
