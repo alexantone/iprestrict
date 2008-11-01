@@ -34,9 +34,7 @@
 <option id="gnu.c.link.option.libs.1681243590" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
 <listOptionValue builtIn="false" value="pcap"/>
 </option>
-<option id="gnu.c.link.option.paths.1098124953" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
-<listOptionValue builtIn="false" value="/usr/lib"/>
-</option>
+<option id="gnu.c.link.option.paths.1098124953" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths"/>
 <inputType id="cdt.managedbuild.tool.gnu.c.linker.input.431654762" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 <additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 <additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -334,7 +332,7 @@
 <inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1732341876" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1327546024" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug">
-<option id="gnu.c.link.option.libs.181206288" superClass="gnu.c.link.option.libs" valueType="libs">
+<option id="gnu.c.link.option.libs.181206288" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
 <listOptionValue builtIn="false" value="pcap"/>
 </option>
 <inputType id="cdt.managedbuild.tool.gnu.c.linker.input.368943331" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
