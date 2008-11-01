@@ -242,14 +242,128 @@ static int parse_subnet (const char* const token, ipr_subnet_t * const out)
 
 }
 
+int parse_rule(const char * const line_buf, const int cline)
+{
+    /*
+     * Eat white-space chars
+     */
+    char *cursor;
+    char *token = NULL;
+
+    cursor = line_buf;
+
+    cursor += strspn(cursor, WHITESPACE_CHARS);
+    if (*cursor == '#') {
+        /*
+         * this is a comment; skip to the next line
+         */
+        return 0;
+    }
+
+    token = strtok(cursor, WHITESPACE_CHARS);
+    if (token == NULL) {
+        return 0;
+    }
+
+    rule_table[rule_cnt] = malloc(sizeof(ipr_rule_t));
+    if (rule_table[rule_cnt] == NULL) {
+        fprintf(stderr,"Could not allocate memory.");
+        return -1;
+    }
+
+    if (strcmp(token, "allow") == 0) {
+        rule_table[rule_cnt]->permission = RULE_ALLOW;
+    } else if (strcmp(token, "deny") == 0) {
+        rule_table[rule_cnt]->permission = RULE_DENY;
+    } else {
+        fprintf(stderr,
+                "Syntax error at line %d: '%s'\n",
+                cline, token);
+        return -1;
+    }
+
+    token = strtok(NULL, WHITESPACE_CHARS);
+    if (token == NULL) {
+        fprintf(stderr,
+                "Syntax error at line %d: more arguments needed.\n",
+                cline);
+        return -1;
+    }
+
+    /*
+     *  Determine the type
+     */
+
+    if (strcmp(token, "ip") == 0) {
+        rule_table[rule_cnt]->type = RULE_IP;
+        token = strtok(NULL,WHITESPACE_CHARS);
+        if (parse_ip(token, &rule_table[rule_cnt]->match.ip) != 0) {
+            fprintf(stderr,
+                    "Syntax error at line %d: '%s'\n",
+                    cline, token);
+            return -2;
+        }
+    }
+    else if (strcmp(token, "subnet") == 0) {
+        rule_table[rule_cnt]->type = RULE_SUBNET;
+        token = strtok(NULL,WHITESPACE_CHARS);
+        if (parse_subnet(token, &rule_table[rule_cnt]->match.subnet) != 0) {
+            fprintf(stderr,
+                    "Syntax error at line %d: '%s'\n",
+                    cline, token);
+            return -2;
+        }
+    }
+    else if (strcmp(token, "range") == 0) {
+        rule_table[rule_cnt]->type = RULE_RANGE;
+        token = strtok(NULL,WHITESPACE_CHARS);
+        if (parse_range(token, &rule_table[rule_cnt]->match.range) != 0) {
+            fprintf(stderr,
+                    "Syntax error at line %d: '%s'\n",
+                    cline, token);
+            return -2;
+        }
+        /*
+         * We use htonl() to avoid any endianness problems
+         * by forcing a BigEndian comparisson.
+         */
+        if (htonl(rule_table[rule_cnt]->match.range.start.ip_v) >
+        htonl(rule_table[rule_cnt]->match.range.stop.ip_v)) {
+            fprintf(stderr,
+                    "Syntax error at line %d: '%s'\n",
+                    cline, token);
+            return -2;
+        }
+    }
+    else if (strcmp(token, "all") == 0) {
+        rule_table[rule_cnt]->type = RULE_ALL;
+    }
+    else {
+        fprintf(stderr,
+                "Syntax error at line %d: more arguments needed.\n",
+                cline);
+        return -2;
+    }
+
+    token = strtok(NULL, WHITESPACE_CHARS);
+    if (token != NULL){
+        fprintf(stderr,
+                "Illegal syntax in configuration file. "
+                "Unknown parameter after the end of rule at line %d.\n",
+                cline);
+        return -2;
+    }
+
+    return 0;
+}
+
 int parse_file(FILE ** p_fh)
 {
 
     int ix = 0;
     char line_buf[512];
-    char *cursor;
-    char *token = NULL;
     int cline = 0;
+    int prule_result = 0;
 
     if (p_fh == NULL) {
         return -1;
@@ -273,112 +387,11 @@ int parse_file(FILE ** p_fh)
 
     while (fgets(line_buf, sizeof(line_buf), *p_fh) &&
            rule_cnt < MAX_ENTRIES - 1) {
-        /*
-         * Eat white-space chars
-         */
         cline++;
-        cursor = line_buf;
 
-        cursor += strspn(cursor, WHITESPACE_CHARS);
-        if (*cursor == '#') {
-            /*
-             * this is a comment; skip to the next line
-             */
-            continue;
-        }
-
-        token = strtok(cursor, WHITESPACE_CHARS);
-        if (token == NULL) {
-            continue;
-        }
-
-        rule_table[rule_cnt] = malloc(sizeof(ipr_rule_t));
-        if (rule_table[rule_cnt] == NULL) {
-            fprintf(stderr,"Could not allocate memory.");
-            return -1;
-        }
-
-        if (strcmp(token, "allow") == 0) {
-            rule_table[rule_cnt]->permission = RULE_ALLOW;
-        } else if (strcmp(token, "deny") == 0) {
-            rule_table[rule_cnt]->permission = RULE_DENY;
-        } else {
-            fprintf(stderr,
-                    "Syntax error at line %d: '%s'\n",
-                    cline, token);
-            return -1;
-        }
-
-        token = strtok(NULL, WHITESPACE_CHARS);
-        if (token == NULL) {
-            fprintf(stderr,
-                    "Syntax error at line %d: more arguments needed.\n",
-                    cline);
-            return -1;
-        }
-
-        /*
-         *  Determine the type
-         */
-
-        if (strcmp(token, "ip") == 0) {
-            rule_table[rule_cnt]->type = RULE_IP;
-            token = strtok(NULL,WHITESPACE_CHARS);
-            if (parse_ip(token, &rule_table[rule_cnt]->match.ip) != 0) {
-                fprintf(stderr,
-                        "Syntax error at line %d: '%s'\n",
-                        cline, token);
-                return -2;
-            }
-        }
-        else if (strcmp(token, "subnet") == 0) {
-            rule_table[rule_cnt]->type = RULE_SUBNET;
-            token = strtok(NULL,WHITESPACE_CHARS);
-            if (parse_subnet(token, &rule_table[rule_cnt]->match.subnet) != 0) {
-                fprintf(stderr,
-                        "Syntax error at line %d: '%s'\n",
-                        cline, token);
-                return -2;
-            }
-        }
-        else if (strcmp(token, "range") == 0) {
-            rule_table[rule_cnt]->type = RULE_RANGE;
-            token = strtok(NULL,WHITESPACE_CHARS);
-            if (parse_range(token, &rule_table[rule_cnt]->match.range) != 0) {
-                fprintf(stderr,
-                        "Syntax error at line %d: '%s'\n",
-                        cline, token);
-                return -2;
-            }
-            /*
-             * We use htonl() to avoid any endianness problems
-             * by forcing a BigEndian comparisson.
-             */
-            if (htonl(rule_table[rule_cnt]->match.range.start.ip_v) >
-                htonl(rule_table[rule_cnt]->match.range.stop.ip_v)) {
-                fprintf(stderr,
-                        "Syntax error at line %d: '%s'\n",
-                        cline, token);
-                return -2;
-            }
-        }
-        else if (strcmp(token, "all") == 0) {
-            rule_table[rule_cnt]->type = RULE_ALL;
-        }
-        else {
-            fprintf(stderr,
-                    "Syntax error at line %d: more arguments needed.\n",
-                    cline);
-            return -2;
-        }
-
-        token = strtok(NULL, WHITESPACE_CHARS);
-        if (token != NULL){
-            fprintf(stderr,
-                    "Illegal syntax in configuration file. "
-                    "Unknown parameter after the end of rule at line %d.\n",
-                    cline);
-            return -2;
+        prule_result = parse_rule(line_buf, cline);
+        if (prule_result !=0 ){
+            return prule_result;
         }
 
         rule_cnt++;

@@ -26,6 +26,7 @@ static const int default_locations_cnt = sizeof(default_locations)
 extern int parse_args (const int argc, char * const argv[],
                        FILE ** p_fh, char ** p_ifdev);
 
+extern int parse_rule(const char * const line_buf, const int cline);
 extern int parse_file(FILE ** p_fh);
 
 #endif /* PARSE_H_ */
