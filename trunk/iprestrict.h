@@ -67,15 +67,18 @@ extern int rule_cnt;
  * Device subinterfaces structures
  */
 
-#define MAX_SUBINTERFACES 256
+#define MAX_SUBINTERFACES 1024
 
 typedef struct {
     unsigned char inuse;
+    unsigned int  id;
     ipr_ip_t      ip;
     unsigned int  ttl;      // how many packets will this subinterface be taken
 } dev_sif_t;
 
 extern dev_sif_t subif_table[MAX_SUBINTERFACES];
+extern char * dev;
+
 extern inline uint32_t ip_val(ipr_ip_t ip);
 
 #endif /* IPRESTRICT_H_ */
