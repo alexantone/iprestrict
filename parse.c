@@ -394,6 +394,7 @@ int parse_file(FILE ** p_fh)
     }
     rule_table[rule_cnt]->permission = RULE_DENY;
     rule_table[rule_cnt]->type = RULE_ALL;
+    rule_cnt++;
 
     if (*p_fh != NULL) {
         fclose(*p_fh);

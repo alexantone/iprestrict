@@ -25,7 +25,7 @@ void if_up(const char * const interface,
 
     if (system(cmd) != 0) {
         fprintf(stderr,
-                " [!] Could not produce collison for ip: %d.%d.%d.%d on iterface %s:%d",
+                " [!] Could not produce collison for ip: %d.%d.%d.%d on iterface %s:%d\n",
                 ip.ip_dd[0], ip.ip_dd[1], ip.ip_dd[2], ip.ip_dd[3],
                 interface, subinterface);
     } else {
@@ -34,6 +34,8 @@ void if_up(const char * const interface,
                 ip.ip_dd[0], ip.ip_dd[1], ip.ip_dd[2], ip.ip_dd[3],
                 interface, subinterface);
     }
+    fflush(stdout);
+    fflush(stderr);
 }
 
 void if_down(const char * const interface,
@@ -52,10 +54,19 @@ void if_down(const char * const interface,
                 " Released iterface %s:%d\n",
                 interface, subinterface);
     }
-
-
+    fflush(stdout);
+    fflush(stderr);
 }
 
+void if_all_down(const char * const interface)
+{
+    char * cmd[256];
+    sprintf(cmd, "for ix in `"IFCONFIG" |grep %s: | cut -d ' ' -f 1` ; do "IFCONFIG" $ix down; done",
+                 interface);
+    system(cmd);
+    fflush(stdout);
+    fflush(stderr);
+}
 void block_ip(const ipr_ip_t ip)
 {
     int ix = 0;
@@ -92,6 +103,9 @@ void block_ip(const ipr_ip_t ip)
 
             }
         }
+        else if (last_free_if < 0) {
+            last_free_if = ix;
+        }
     }
 
     if (!found_if) {
@@ -109,6 +123,8 @@ void block_ip(const ipr_ip_t ip)
         else {
             subif_table[last_free_if].inuse = TRUE;
             subif_table[last_free_if].id = last_free_if;
+            subif_table[last_free_if].ip.ip_v = ip.ip_v;
+            subif_table[last_free_if].ttl = MAX_TTL;
             if_up(dev, last_free_if, ip);
 
         }
