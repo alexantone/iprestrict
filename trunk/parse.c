@@ -19,12 +19,12 @@
 int parse_args (const int argc, char * const argv[],
                 FILE ** p_fh, char ** p_ifdev)
 {
-    
+
 
     int ix = 1;
     FILE * fh = NULL;
     char * ifdev = NULL;
-    
+
     if (p_fh == NULL || p_ifdev == NULL) {
         return -1;
     }
@@ -81,14 +81,14 @@ int parse_ip (const char * const token, ipr_ip_t * const out)
             return -1;
         }
 
-        if (*cursor != '.' && ix < 3) {
+        if (ix < 3 && *cursor != '.') {
             return -2;
         }
 
         if (ix < 3) {
             cursor++;
         }
-        
+
         out->ip_dd[ix] = temp_byte;
         ix++;
     }
@@ -134,7 +134,7 @@ int parse_range (const char * const token, ipr_range_t * const out)
         out->start.ip_dd[ix] = temp_byte;
         ix++;
     }
-    
+
     if (*cursor != '-') {
         return -3;
     }
@@ -204,7 +204,7 @@ int parse_subnet (const char* const token, ipr_subnet_t * const out)
         out->ip.ip_dd[ix] = temp_byte;
         ix++;
     }
-    
+
     if (*cursor != '/') {
         return -3;
     }
@@ -214,9 +214,9 @@ int parse_subnet (const char* const token, ipr_subnet_t * const out)
     if (temp_mask > MAX_MASK_BYTES) {
         return -4;
     }
-    
+
     out->mask = temp_mask;
-    
+
     return 0;
 
 }
@@ -230,7 +230,7 @@ int parse_file(FILE ** p_fh)
     char *token = NULL;
     int cline = 0;
     FILE * fh = NULL;
-    
+
     if (p_fh == NULL) {
         return -1;
     }
@@ -272,13 +272,13 @@ int parse_file(FILE ** p_fh)
         if (token == NULL) {
             continue;
         }
-        
+
         rule_table[rule_cnt] = malloc(sizeof(ipr_rule_t));
         if (rule_table[rule_cnt] == NULL) {
             fprintf(stderr,"Could not allocate memory.");
             return -1;
         }
-        
+
         if (strcmp(token, "allow") == 0) {
             rule_table[rule_cnt]->permission = RULE_ALLOW;
         } else if (strcmp(token, "deny") == 0) {
@@ -350,16 +350,18 @@ int parse_file(FILE ** p_fh)
             fprintf(stderr,
                     "Syntax error at line %d: more arguments needed.\n",
                     cline);
+            return -2;
         }
-        
+
         token = strtok(NULL, WHITESPACE_CHARS);
         if (token != NULL){
             fprintf(stderr,
                     "Illegal syntax in configuration file. "
                     "Unknown parameter after the end of rule at line %d.\n",
                     cline);
+            return -2;
         }
-        
+
         rule_cnt++;
     }
 
@@ -373,7 +375,7 @@ int parse_file(FILE ** p_fh)
     }
     rule_table[rule_cnt]->permission = RULE_DENY;
     rule_table[rule_cnt]->type = RULE_ALL;
-    
+
     if (fh != NULL) {
         fclose(fh);
     }
