@@ -20,7 +20,9 @@
 
 #define MAX_MASK_BYTES 32
 
-
+/* ethernet headers are always exactly 14 bytes */
+#define ETHERNET_HEADER_LEN 14
+/* IP headers are 20 bytes up to destination ip address*/
 #define IP_HEADER_LEN  20
 
 #define TRUE  1
@@ -33,8 +35,8 @@
 #define MAX_ENTRIES 1024
 
 typedef union {
-    unsigned char ip_dd[4];
-    uint32_t      ip_v;
+    uint8_t     ip_dd[4];
+    uint32_t    ip_v;
 } ipr_ip_t;
 
 typedef struct {
