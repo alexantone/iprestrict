@@ -14,11 +14,11 @@
 
 #include "iprestrict.h"
 #include "parse.h"
-#include "subinterface.h"
 #include "capture.h"
+#include "subinterface.h"
 
 static FILE *fh = NULL;
-static char *dev = NULL;
+char *dev = NULL;
 
 ipr_rule_t* rule_table[MAX_ENTRIES];
 int rule_cnt = 0;
@@ -96,9 +96,9 @@ void do_cleanup(void) {
     }
 
     for (ix = 0; ix < MAX_SUBINTERFACES; ix++) {
-        /*
-         * TODO: Subinterfaces cleanup
-         */
+        if (subif_table[ix].inuse) {
+            if_down(dev, subif_table[ix].id);
+        }
     }
 }
 

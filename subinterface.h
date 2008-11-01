@@ -14,4 +14,12 @@
 
 extern void block_ip(ipr_ip_t ip);
 
+extern void if_up(const char * const interface,
+           const unsigned int subinterface,
+           const ipr_ip_t ip);
+
+extern void if_down(const char * const interface,
+             const unsigned int subinterface);
+
+
 #endif /* SUBINTERFACE_H_ */
