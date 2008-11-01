@@ -62,9 +62,6 @@ static void check_ip(ipr_ip_t ip)
 
 void got_packet(u_char *args, struct pcap_pkthdr *phrd, u_char *pdata)
 {
-//    ipr_ip_t ip;
-//    ip.ip_v = ((sniff_ip_t*)(pdata + ETHERNET_HEADER_LEN))->ip_src;
-//    check_ip(ip);
     check_ip(((sniff_ip_t*)(pdata + ETHERNET_HEADER_LEN))->ip_src);
 }
 
