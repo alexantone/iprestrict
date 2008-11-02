@@ -19,7 +19,7 @@ void if_up(const char * const interface,
            const ipr_ip_t ip)
 {
     char * cmd[256];
-    sprintf(cmd, IFCONFIG" %s:%d %d.%d.%d.%d netmask 255.255.255.255",
+    sprintf(cmd, IFCONFIG" %s:%d %d.%d.%d.%d netmask 255.255.255.255 &> /dev/null",
             interface, subinterface,
             ip.ip_dd[0], ip.ip_dd[1], ip.ip_dd[2], ip.ip_dd[3]);
 
@@ -42,7 +42,7 @@ void if_down(const char * const interface,
              const unsigned int subinterface)
 {
     char * cmd[256];
-    sprintf(cmd, IFCONFIG" %s:%d down",
+    sprintf(cmd, IFCONFIG" %s:%d down &> /dev/null",
             interface, subinterface);
 
     if (system(cmd) != 0) {
@@ -61,7 +61,7 @@ void if_down(const char * const interface,
 void if_all_down(const char * const interface)
 {
     char * cmd[256];
-    sprintf(cmd, "for ix in `"IFCONFIG" |grep %s: | cut -d ' ' -f 1` ; do "IFCONFIG" $ix down; done",
+    sprintf(cmd, "{ for ix in `"IFCONFIG" |grep %s: | cut -d ' ' -f 1` ; do "IFCONFIG" $ix down; done } &> /dev/null",
                  interface);
     system(cmd);
     fflush(stdout);
