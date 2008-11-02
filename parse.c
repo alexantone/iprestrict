@@ -11,8 +11,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <arpa/inet.h>
-
 #include "iprestrict.h"
 #include "parse.h"
 
@@ -323,12 +321,13 @@ int parse_rule(const char * const line_buf, const int cline)
                     cline, token);
             return -2;
         }
+
         /*
-         * We use htonl() to avoid any endianness problems
-         * by forcing a BigEndian comparisson.
+         * No need to use htonl() anymore to avoid any endianness problems.
+         * Use our own function to do BigEndian comparisson.
          */
-        if (htonl(rule_table[rule_cnt]->match.range.start.ip_v) >
-        htonl(rule_table[rule_cnt]->match.range.stop.ip_v)) {
+        if (ip_val(rule_table[rule_cnt]->match.range.start) >
+        ip_val(rule_table[rule_cnt]->match.range.stop)) {
             fprintf(stderr,
                     "Syntax error at line %d: '%s'\n",
                     cline, token);
