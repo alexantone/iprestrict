@@ -91,7 +91,9 @@ void do_cleanup(void) {
 
     int ix = 0;
 
-    if_all_down(dev);
+    if (dev != NULL) {
+        if_all_down(dev);
+    }
 
     if (fh != NULL) {
         fclose(fh);
